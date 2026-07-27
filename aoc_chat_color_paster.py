@@ -19,7 +19,7 @@ import sys
 import tkinter as tk
 from tkinter import ttk, messagebox, colorchooser, filedialog
 
-__version__ = "1.8.0"
+__version__ = "1.9.0"
 
 COLORS = [
     ("Red", "#ff0000"),
@@ -188,8 +188,8 @@ class AoCChatPaster(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(f"AoC Chat Color Script Maker v{__version__}")
-        self.geometry("620x860")
-        self.minsize(520, 700)
+        self.geometry("560x600")
+        self.minsize(480, 520)
         self.configure(bg=BG)
         self.attributes("-topmost", True)
         self.selected_color = tk.StringVar(value="#ff4500")
@@ -214,8 +214,8 @@ class AoCChatPaster(tk.Tk):
     def _mk_button(self, parent, text, command, bg=PANEL_2, fg=TEXT, hi="#2a2a3a", bold=True):
         btn = tk.Label(
             parent, text=text, bg=bg, fg=fg,
-            font=FONT_UI_B if bold else FONT_UI,
-            padx=14, pady=8, cursor="hand2",
+            font=("Segoe UI", 10, "bold") if bold else ("Segoe UI", 10),
+            padx=10, pady=5, cursor="hand2",
         )
         btn.bind("<Button-1>", lambda e: command())
         btn.bind("<Enter>", lambda e: btn.config(bg=hi))
@@ -239,7 +239,7 @@ class AoCChatPaster(tk.Tk):
         vsb.pack(side=tk.RIGHT, fill=tk.Y)
         self.scroll_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        main = tk.Frame(self.scroll_canvas, bg=BG, padx=18, pady=14)
+        main = tk.Frame(self.scroll_canvas, bg=BG, padx=12, pady=10)
         win_id = self.scroll_canvas.create_window((0, 0), window=main, anchor=tk.NW)
 
         def on_frame_configure(event=None):
@@ -257,16 +257,15 @@ class AoCChatPaster(tk.Tk):
         # Wheel events go to the widget under the cursor; bind globally.
         self.bind_all("<MouseWheel>", on_wheel)
 
-        # ── Header: canvas gradient band ──
-        header = tk.Canvas(main, height=64, bg=BG, highlightthickness=0, bd=0)
-        header.pack(fill=tk.X, pady=(0, 6))
+        # ── Header: slim gradient band ──
+        header = tk.Canvas(main, height=40, bg=BG, highlightthickness=0, bd=0)
+        header.pack(fill=tk.X, pady=(0, 4))
 
         def paint_header(event=None):
             header.delete("all")
-            w = header.winfo_width() or 580
+            w = header.winfo_width() or 536
             steps = 40
             for i in range(steps):
-                # horizontal ember -> gold -> dark gradient
                 t = i / (steps - 1)
                 r1, g1, b1 = (0x38, 0x1a, 0x08)
                 r2, g2, b2 = (0x66, 0x4d, 0x1c)
@@ -275,28 +274,30 @@ class AoCChatPaster(tk.Tk):
                 b = int(b1 + (b2 - b1) * t)
                 x0 = int(w * i / steps)
                 x1 = int(w * (i + 1) / steps) + 1
-                header.create_rectangle(x0, 0, x1, 64, fill=f"#{r:02x}{g:02x}{b:02x}", outline="")
-            header.create_rectangle(0, 62, w, 64, fill=GOLD, outline="")
-            header.create_text(16, 32, anchor=tk.W, text="AoC CHAT COLOR",
-                               font=FONT_TITLE, fill=GOLD_HI)
-            tw = header.create_text(16, 33, anchor=tk.W, text="AoC CHAT COLOR",
-                                    font=FONT_TITLE, fill="#000000")
-            header.lower(tw)
-            header.create_text(w - 16, 32, anchor=tk.E, text=f"v{__version__}",
+                header.create_rectangle(x0, 0, x1, 40, fill=f"#{r:02x}{g:02x}{b:02x}", outline="")
+            header.create_rectangle(0, 38, w, 40, fill=GOLD, outline="")
+            header.create_text(12, 20, anchor=tk.W, text="AoC CHAT COLOR",
+                               font=("Segoe UI", 14, "bold"), fill=GOLD_HI)
+            header.create_text(w - 10, 20, anchor=tk.E, text=f"v{__version__}",
                                font=FONT_SUB, fill=MUTED)
 
         header.bind("<Configure>", paint_header)
 
+        sub_row = tk.Frame(main, bg=BG)
+        sub_row.pack(fill=tk.X, pady=(0, 8))
         tk.Label(
-            main,
-            text="Pick a color once, type, press Enter — /chat.txt is copied. Ctrl+V it in game chat.",
+            sub_row, text="made by EpicShovel",
+            bg=BG, fg="#b06bff", font=("Segoe UI", 9, "bold"), anchor=tk.E,
+        ).pack(side=tk.RIGHT)
+        tk.Label(
+            sub_row,
+            text="Pick a color, type, press Enter — /chat.txt is copied. Ctrl+V it in game chat.",
             bg=BG, fg=MUTED, font=FONT_SUB, anchor=tk.W, justify=tk.LEFT,
-        ).pack(fill=tk.X, pady=(0, 12))
+        ).pack(side=tk.LEFT, fill=tk.X, expand=True)
 
         # ── Message input ──
-        self._mk_section(main, "Message").pack(fill=tk.X, pady=(0, 6))
         self.input_frame = tk.Frame(main, bg=BORDER, padx=1, pady=1)
-        self.input_frame.pack(fill=tk.X, pady=(0, 12))
+        self.input_frame.pack(fill=tk.X, pady=(0, 8))
 
         self.entry = tk.Text(
             self.input_frame,
@@ -304,7 +305,7 @@ class AoCChatPaster(tk.Tk):
             bg=INPUT_BG, fg=TEXT,
             insertbackground=GOLD,
             selectbackground=GOLD, selectforeground="#18140b",
-            font=FONT_EDIT, relief=tk.FLAT, bd=12, height=3,
+            font=FONT_EDIT, relief=tk.FLAT, bd=8, height=2,
         )
         self.entry.pack(fill=tk.X)
         self.entry.insert("1.0", "Hello Hyboria!")
@@ -312,17 +313,16 @@ class AoCChatPaster(tk.Tk):
         self.entry.bind("<FocusOut>", lambda e: self.input_frame.config(bg=BORDER))
         Tooltip(self.entry, "Type your message here.\nPress Enter to save it and copy the /command.")
 
-        # ── Color picker ──
-        self._mk_section(main, "Color").pack(fill=tk.X, pady=(0, 6))
+        # ── Color picker + auto-color ──
         toolbar = tk.Frame(main, bg=BG)
-        toolbar.pack(fill=tk.X, pady=(0, 8))
+        toolbar.pack(fill=tk.X, pady=(0, 4))
 
         for name, hex_code in COLORS:
-            cell = tk.Frame(toolbar, bg=BG, padx=2, pady=2)
+            cell = tk.Frame(toolbar, bg=BG, padx=1, pady=1)
             cell.pack(side=tk.LEFT)
             btn = tk.Label(
-                cell, text="  ", bg=hex_code, width=3, cursor="hand2",
-                relief=tk.FLAT, bd=0,
+                cell, text="  ", bg=hex_code, width=2, cursor="hand2",
+                relief=tk.FLAT, bd=0, font=("Segoe UI", 9),
             )
             btn.pack()
             btn.bind("<Button-1>", lambda e, h=hex_code: self._pick_color(h))
@@ -330,37 +330,37 @@ class AoCChatPaster(tk.Tk):
             self.swatch_btns[hex_code] = (cell, btn)
 
         self.color_btn = self._mk_button(toolbar, "Custom…", self._choose_custom_color)
-        self.color_btn.pack(side=tk.LEFT, padx=(10, 0))
+        self.color_btn.pack(side=tk.LEFT, padx=(8, 0))
         Tooltip(self.color_btn, "Pick any color with the color dialog.")
 
         self.auto_cb = tk.Checkbutton(
-            main,
-            text="Always use the selected color for the whole message (no Apply needed)",
+            toolbar,
+            text="Always use selected color (no Apply needed)",
             variable=self.auto_color_var,
             bg=BG, fg=MUTED, selectcolor=PANEL_2,
             activebackground=BG, activeforeground=TEXT,
             font=FONT_SUB,
             command=self._update_preview,
         )
-        self.auto_cb.pack(anchor=tk.W, pady=(0, 12))
+        self.auto_cb.pack(side=tk.RIGHT)
         Tooltip(self.auto_cb,
                 "On: everything you type is sent in the selected color automatically.\n"
                 "Off: colors are only added where you press Apply.")
 
         # ── Action buttons ──
         btn_row = tk.Frame(main, bg=BG)
-        btn_row.pack(fill=tk.X, pady=(0, 14))
+        btn_row.pack(fill=tk.X, pady=(0, 10))
 
-        apply_btn = self._mk_button(btn_row, "Apply color to selection / all", self._apply_color,
+        apply_btn = self._mk_button(btn_row, "Apply color", self._apply_color,
                         bg=GOLD, fg="#18140b", hi=GOLD_HI)
-        apply_btn.pack(side=tk.LEFT, padx=(0, 8))
+        apply_btn.pack(side=tk.LEFT, padx=(0, 6))
         Tooltip(apply_btn,
                 "Wraps the highlighted text in color tags.\n"
                 "Nothing highlighted? The whole message is wrapped.")
-        clear_btn = self._mk_button(btn_row, "Clear color tags", self._clear_colors)
-        clear_btn.pack(side=tk.LEFT, padx=(0, 8))
+        clear_btn = self._mk_button(btn_row, "Clear tags", self._clear_colors)
+        clear_btn.pack(side=tk.LEFT, padx=(0, 6))
         Tooltip(clear_btn, "Removes all <font> color tags from the message.")
-        save_btn = self._mk_button(btn_row, "Save script & copy /command", self._save_script,
+        save_btn = self._mk_button(btn_row, "Save & copy /command", self._save_script,
                         bg=GREEN_BG, fg=TEXT, hi=GREEN_HI)
         save_btn.pack(side=tk.LEFT)
         Tooltip(save_btn,
@@ -368,72 +368,76 @@ class AoCChatPaster(tk.Tk):
                 "and copies the /command to your clipboard.")
 
         # ── Script destination ──
-        self._mk_section(main, "AoC Scripts folder").pack(fill=tk.X, pady=(0, 6))
         folder_row = tk.Frame(main, bg=BG)
-        folder_row.pack(fill=tk.X, pady=(0, 12))
+        folder_row.pack(fill=tk.X, pady=(0, 8))
 
+        tk.Label(folder_row, text="Scripts:", bg=BG, fg=GOLD,
+                 font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(0, 6))
         self.folder_entry = tk.Entry(
             folder_row, textvariable=self.scripts_folder,
             bg=INPUT_BG, fg=TEXT, insertbackground=GOLD,
-            font=FONT_MONO, relief=tk.FLAT, bd=8,
+            font=("Consolas", 9), relief=tk.FLAT, bd=6,
         )
         self.folder_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
         Tooltip(self.folder_entry,
                 "Age of Conan's Scripts folder — the game reads .txt chat scripts from here.")
         browse_btn = self._mk_button(folder_row, "Browse…", self._browse_folder)
-        browse_btn.pack(side=tk.LEFT, padx=(8, 0))
+        browse_btn.pack(side=tk.LEFT, padx=(6, 0))
         Tooltip(browse_btn, "Pick the Scripts folder with a dialog.")
         open_btn = self._mk_button(folder_row, "Open", self._open_folder)
-        open_btn.pack(side=tk.LEFT, padx=(6, 0))
+        open_btn.pack(side=tk.LEFT, padx=(4, 0))
         Tooltip(open_btn, "Open the Scripts folder in Explorer.")
 
-        self._mk_section(main, "Script file name").pack(fill=tk.X, pady=(0, 6))
+        # ── Script name + in-game command on one row ──
+        name_row = tk.Frame(main, bg=BG)
+        name_row.pack(fill=tk.X, pady=(0, 4))
+
+        tk.Label(name_row, text="File:", bg=BG, fg=GOLD,
+                 font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(0, 6))
         self.name_entry = tk.Entry(
-            main, textvariable=self.script_name,
+            name_row, textvariable=self.script_name, width=14,
             bg=INPUT_BG, fg=TEXT, insertbackground=GOLD,
-            font=FONT_MONO, relief=tk.FLAT, bd=8,
+            font=("Consolas", 9), relief=tk.FLAT, bd=6,
         )
-        self.name_entry.pack(fill=tk.X, pady=(0, 12))
+        self.name_entry.pack(side=tk.LEFT)
         self.script_name.trace_add("write", lambda *_: self._update_command())
         Tooltip(self.name_entry,
                 "The file name IS the in-game command:\nchat.txt is run by typing /chat.txt in game chat.")
 
-        # ── In-game command ──
-        self._mk_section(main, "Type this in AoC chat").pack(fill=tk.X, pady=(0, 6))
-        cmd_frame = tk.Frame(main, bg=BORDER, padx=1, pady=1)
-        cmd_frame.pack(fill=tk.X, pady=(0, 4))
+        cmd_frame = tk.Frame(name_row, bg=BORDER, padx=1, pady=1)
+        cmd_frame.pack(side=tk.RIGHT)
         self.command_lbl = tk.Label(
             cmd_frame, text="/chat.txt",
-            bg=INPUT_BG, fg=GREEN, font=FONT_BIG, anchor=tk.W, padx=10, pady=6,
+            bg=INPUT_BG, fg=GREEN, font=("Consolas", 12, "bold"), anchor=tk.W, padx=8, pady=3,
         )
-        self.command_lbl.pack(fill=tk.X)
+        self.command_lbl.pack()
         Tooltip(self.command_lbl,
                 "Paste this in the game chat (Ctrl+V) and press Enter\n"
                 "to show your colored message.")
 
         self.saved_lbl = tk.Label(
             main, text="Not saved yet",
-            bg=BG, fg=MUTED, font=("Consolas", 9),
-            anchor=tk.W, wraplength=560, justify=tk.LEFT,
+            bg=BG, fg=MUTED, font=("Consolas", 8),
+            anchor=tk.W, wraplength=520, justify=tk.LEFT,
         )
-        self.saved_lbl.pack(fill=tk.X, pady=(0, 12))
+        self.saved_lbl.pack(fill=tk.X, pady=(0, 8))
 
         # ── Preview ──
-        self._mk_section(main, "Preview").pack(fill=tk.X, pady=(0, 6))
         prev_frame = tk.Frame(main, bg=BORDER, padx=1, pady=1)
-        prev_frame.pack(fill=tk.X, pady=(0, 12))
+        prev_frame.pack(fill=tk.X, pady=(0, 8))
         self.preview = tk.Label(
             prev_frame, text="Hello Hyboria!",
             bg=INPUT_BG, fg=TEXT, font=FONT_EDIT,
-            anchor=tk.W, justify=tk.LEFT, wraplength=560, padx=10, pady=10,
+            anchor=tk.W, justify=tk.LEFT, wraplength=520, padx=8, pady=6,
         )
         self.preview.pack(fill=tk.X)
         Tooltip(self.preview, "How your message will look in game.")
 
         # ── Markup output (the readonly-background bug lived here) ──
         markup_head = tk.Frame(main, bg=BG)
-        markup_head.pack(fill=tk.X, pady=(0, 6))
-        self._mk_section(markup_head, "AoC markup").pack(side=tk.LEFT, fill=tk.X, expand=True)
+        markup_head.pack(fill=tk.X, pady=(0, 2))
+        tk.Label(markup_head, text="MARKUP", bg=BG, fg=GOLD,
+                 font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT)
         self.counter_lbl = tk.Label(markup_head, text="0 chars", bg=BG, fg=MUTED, font=FONT_SUB)
         self.counter_lbl.pack(side=tk.RIGHT)
         Tooltip(self.counter_lbl,
@@ -443,10 +447,10 @@ class AoCChatPaster(tk.Tk):
             main,
             bg=INPUT_BG, fg=GREEN, insertbackground=GOLD,
             readonlybackground=INPUT_BG,   # <-- the white-on-white fix
-            font=FONT_MONO, relief=tk.FLAT, bd=8,
+            font=("Consolas", 9), relief=tk.FLAT, bd=6,
             state="readonly",
         )
-        self.output.pack(fill=tk.X, pady=(0, 10))
+        self.output.pack(fill=tk.X)
         Tooltip(self.output, "The exact text written into the script file.")
 
         self._update_preview()
